@@ -1,0 +1,4 @@
+diesel setup :setup diesel library
+diesel migration run :run diesel migrations
+diesel migration redo :redo migrations
+diesel_ext --model > src/models.rs :generate migrations

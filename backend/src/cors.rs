@@ -1,4 +1,8 @@
-use rocket::{fairing::{Fairing, Info, Kind}, Request, http::Header, Response};
+use rocket::{
+    fairing::{Fairing, Info, Kind},
+    http::Header,
+    Request, Response,
+};
 
 /// Catches all OPTION requests in order to get the CORS related Fairing triggered.
 #[options("/<_..>")]
