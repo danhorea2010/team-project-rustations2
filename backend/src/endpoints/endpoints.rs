@@ -18,7 +18,7 @@ pub async fn get_all_todos() -> Json<Vec<TodoDTO>> {
 
 #[post("/", format = "json", data = "<new_todo>")]
 pub async fn insert_todo(new_todo: Json<NewTodoDTO>) -> Json<Vec<TodoDTO>> {
-    let todos = insert(new_todo.into_inner().to_entity());
+    let todos = insert(new_todo.into_inner().into());
     let mut result: Vec<TodoDTO> = Vec::new();
     for todo in todos.iter() {
         let todo_dto = TodoDTO::new(todo.clone());
