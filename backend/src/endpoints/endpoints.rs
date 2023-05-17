@@ -1,8 +1,9 @@
-use crate::repository::todo_repository::{
-    get_all
-};
+use crate::{repository::todo_repository::{
+    get_all,
+    insert
+}};
 use rocket::{serde::json::Json};
-use crate::dtos::todo::{TodoDTO};
+use crate::dtos::todo::{TodoDTO, NewTodoDTO};
 
 #[get("/")]
 pub async fn get_all_todos() -> Json<Vec<TodoDTO>> {
@@ -15,10 +16,16 @@ pub async fn get_all_todos() -> Json<Vec<TodoDTO>> {
     rocket::serde::json::Json(result)
 }
 
-// #[post("/", data = "<todo>")]
-// pub async fn insert(todo: Json<Todo>, service: &State<Service>) -> Status {
-//     Status::Created
-// }
+#[post("/", format = "json", data = "<new_todo>")]
+pub async fn insert_todo(new_todo: Json<NewTodoDTO>) -> Json<Vec<TodoDTO>> {
+    let todos = insert(new_todo.into_inner().to_entity());
+    let mut result: Vec<TodoDTO> = Vec::new();
+    for todo in todos.iter() {
+        let todo_dto = TodoDTO::new(todo.clone());
+        result.push(todo_dto);
+    }
+    rocket::serde::json::Json(result)
+}
 
 // #[delete("/", data = "<id>")]
 // pub async fn delete(id: Json<IdDto>, service: &State<Service>) -> Status {

@@ -1,6 +1,6 @@
 use diesel::RunQueryDsl;
 
-use crate::models::models::Todo;
+use crate::models::models::{Todo, NewTodo};
 use crate::repository::connection::database_connection::{establish_connection};
 use crate::schema::todos::dsl::*;
 use diesel::prelude::QueryResult;
@@ -20,18 +20,23 @@ pub fn get_all() -> Vec<Todo>
     }
 }
 
-// pub fn insert(new_todo: NewTodo) -> todo
-// {
-//     let connection = &mut establish_connection();
-//     let new_todo = vec![
-//         (name.eq(new_todo.name), description.eq(new_todo.description), published.eq(false))
-//     ];
-
-//     diesel::insert_into(todo::table)
-//         .values(&new_todo)
-//         .get_result(conn)
-//         .expect("Error saving new post")
-// }
+pub fn insert(new_todo: NewTodo) -> Vec<Todo>
+{
+    let new_todos = vec![new_todo];
+    let connection = &mut establish_connection();
+    let results = diesel::insert_into(todos)
+        .values(&new_todos)
+        .get_results(connection);
+    match results {
+        QueryResult::Err(error) => {
+            let result: Vec<Todo> = Vec::new();
+            error!("{}", error);
+            result
+        },
+        QueryResult::Ok(query_result) => query_result
+    }
+    
+}
 
 // pub fn update(update_todo: Todo) -> Todo
 // {

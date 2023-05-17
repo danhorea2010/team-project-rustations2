@@ -8,13 +8,13 @@ mod schema;
 mod models;
 mod dtos;
 
-use endpoints::{endpoints::get_all_todos, cors::Cors};
+use endpoints::{endpoints::{get_all_todos, insert_todo}, cors::Cors};
 
 
 #[launch]
 async fn rocket() -> _ {
     rocket::build().attach(Cors).mount(
         "/",
-        routes![get_all_todos],
+        routes![get_all_todos, insert_todo],
     )
 }
