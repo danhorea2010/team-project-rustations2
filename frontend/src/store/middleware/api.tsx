@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as actions from '../baseapi';
 
-const BASEAPI = "http://127.0.0.1:8000/api/v1/todo";
+const BASEAPI = "http://127.0.0.1:8000/";
 
 export const serializeParams = (params: any) => {
   if (!params) {

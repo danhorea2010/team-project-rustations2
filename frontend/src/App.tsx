@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './App.css'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState, useAppDispatch, useAppSelector } from './main'
+import { useAppDispatch, useAppSelector } from './main'
 import { loadTodos, Todo } from './store/todos'
 
 function App() {
