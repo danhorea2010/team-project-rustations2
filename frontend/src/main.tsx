@@ -8,10 +8,14 @@ import {Provider, TypedUseSelectorHook, useDispatch, useSelector} from 'react-re
 import {configureStore} from '@reduxjs/toolkit';
 import api from './store/middleware/api'
 import todos from './store/todos'
+import agenda from './store/agenda'
+import news from './store/news'
 
 export const store = configureStore ({
   reducer: {
-    todos    
+    todos,
+    agenda,
+    news
   },
   middleware: [thunk, api]
 });

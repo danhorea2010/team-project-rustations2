@@ -13,13 +13,13 @@ export const Home = () => {
                     <Link to="/todo">Todos</Link>
                 </div>
                 <div>
-                    <Link to="/todo">Agenda</Link>
+                    <Link to="/agenda">Agenda</Link>
                 </div>
                 <div>
-                    <Link to="/todo">Deadlines</Link>
+                    <Link to="/deadlines">Deadlines</Link>
                 </div>
                 <div>
-                    <Link to="/todo">News</Link>
+                    <Link to="/news">News</Link>
                 </div>
             </div>
         </div>

@@ -7,15 +7,14 @@ import { Home } from "./pages/Home";
 import { Todos } from "./pages/Todos";
 
 function App() {
-  const [count, setCount] = useState(0);
-  const dispatch = useAppDispatch();
-  const todosState = useAppSelector((state) => state.todos);
-
   return (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/todo" element={<Todos />} />
+          <Route path="/agenda" element={<Todos />} />
+          <Route path="/deadlines" element={<Todos />} />
+          <Route path="/news" element={<Todos />} />
         </Routes>
       </BrowserRouter>
   );
