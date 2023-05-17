@@ -1,6 +1,6 @@
-use diesel::{RunQueryDsl};
+use diesel::RunQueryDsl;
 
-use crate::models::{Todo};
+use crate::models::models::Todo;
 use crate::repository::connection::database_connection::{establish_connection};
 use crate::schema::todos::dsl::*;
 use diesel::prelude::QueryResult;

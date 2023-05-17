@@ -1,6 +1,7 @@
-use crate::models::{Todo};
-use serde::ser::{Serialize, Serializer, SerializeStruct};
+use crate::models::models::Todo;
+use serde::{Serialize, Deserialize};
 
+#[derive(Debug,Clone, Serialize, Deserialize)]
 pub struct TodoDTO {
     pub id: i32,
     pub title: String,
@@ -16,18 +17,5 @@ impl TodoDTO {
             description: todo.description,
             visibility: todo.visibility
         }
-    }
-}
-
-impl Serialize for TodoDTO {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where S: Serializer
-    {
-        let mut state = serializer.serialize_struct("TodoDTO", 4)?;
-        state.serialize_field("id", &self.id)?;
-        state.serialize_field("title", &self.title)?;
-        state.serialize_field("body", &self.description)?;
-        state.serialize_field("visibility", &self.visibility)?;
-        state.end()
     }
 }

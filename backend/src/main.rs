@@ -1,15 +1,15 @@
-use crate::cors::*;
-use crate::endpoints::*;
 
 #[macro_use]
 extern crate rocket;
 
-mod cors;
 mod endpoints;
 mod repository;
 mod schema;
 mod models;
 mod dtos;
+
+use endpoints::{endpoints::get_all_todos, cors::Cors};
+
 
 #[launch]
 async fn rocket() -> _ {
