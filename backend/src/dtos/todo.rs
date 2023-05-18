@@ -27,12 +27,12 @@ impl TodoDTO {
     }
 }
 
-impl NewTodoDTO {
-    pub fn to_entity(&mut self) -> NewTodo {
-        NewTodo {
-            title: self.title.clone(),
-            description: self.description.clone(),
-            visibility: self.visibility
+impl From<NewTodo> for NewTodoDTO {
+    fn from(todo: NewTodo) -> Self {
+        NewTodoDTO { 
+            title: todo.title.clone(), 
+            description: todo.description.clone(), 
+            visibility: todo.visibility 
         }
     }
 }

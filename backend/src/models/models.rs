@@ -2,6 +2,7 @@
 
 use diesel::Queryable;
 use diesel::Insertable;
+use crate::dtos::todo::NewTodoDTO;
 use crate::schema::todos;
 
 #[derive(Queryable, Debug, Clone)]
@@ -18,4 +19,14 @@ pub struct NewTodo {
     pub title: String,
     pub description: Option<String>,
     pub visibility: i16,
+}
+
+impl From<NewTodoDTO> for NewTodo {
+    fn from(dto: NewTodoDTO) -> Self {
+        NewTodo { 
+            title: dto.title.clone(),
+            description: dto.description.clone(), 
+            visibility: dto.visibility 
+        }
+    }
 }
