@@ -7,6 +7,11 @@ export type Todo = {
   description: string,
 }
 
+export type NewTodo = {
+  title: string,
+  description: string,
+}
+
 type TodosState = {
   todosList: Todo[],
   todosLoading: boolean,
@@ -45,11 +50,11 @@ const todosSlice = createSlice({
     },
     todosInsertSuccess: (state, action: PayloadAction<Todo>) => {
       state.todosOperationLoading = false;
-      state.todosList.push(action.payload);
+      state.todosList = state.todosList.concat(action.payload);
     },
     todosInsertFailed: (state, action) => {
       state.todosOperationLoading = false;
-    }
+    },
   },
 });
 
@@ -81,4 +86,17 @@ export const deleteTodo = (id: number) => (dispatch: any, getState: any) => {
     onSuccess: todosDeleteSuccess.type,
     onError: todosDeleteFailed.type,
     }))
+}
+
+export const insertTodo = (todo: NewTodo) => (dispatch: any, getState: any) => {
+  return dispatch(
+    apiCallBegan({
+      url: '/todo',
+      method: 'post',
+      data: {...todo},
+      onStart: todosInsertRequested.type,
+      onSuccess: todosInsertSuccess.type,
+      onError: todosInsertFailed.type,
+    })
+  )
 }
