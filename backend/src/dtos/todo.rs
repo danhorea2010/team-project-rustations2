@@ -36,3 +36,16 @@ impl From<NewTodo> for NewTodoDTO {
         }
     }
 }
+
+impl From<Todo> for TodoDTO {
+    fn from(todo: Todo) -> Self {
+        TodoDTO {
+            id: todo.id, 
+            title: todo.title,
+            description: todo.description, 
+            visibility: todo.visibility 
+        }
+    }
+}
+
+
