@@ -6,7 +6,7 @@ export const Home = () => {
     return (
         <div>
             <div>
-                <h1>Agenda Home</h1>
+                <h1>Agenda home</h1>
             </div>
             <div>
                 <div>

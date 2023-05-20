@@ -22,10 +22,6 @@ export const News = () => {
             
             <h1>News</h1>
             {newsLoading && <h2>Loading...</h2>}
-            <DataTable value={newsList}>
-                <Column className="pb-5 pr-5" field="title" header="Title"></Column>
-                <Column className="pb-5 pr-5" field="description" header="Content"></Column>
-            </DataTable>
             <div>
                 <Link to="/todo">Todos</Link>
             </div>
@@ -38,6 +34,12 @@ export const News = () => {
             <div>
                 <Link to="/news">News</Link>
             </div>
+            <DataTable value={newsList}>
+                <Column className="pb-5 pr-5" field="title" header="Title"></Column>
+                <Column className="pb-5 pr-5" field="description" header="Content"></Column>
+            </DataTable>
+
+
         </div>
     )
 }

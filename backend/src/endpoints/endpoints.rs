@@ -1,19 +1,25 @@
-use crate::{repository::{todo_repository::{
-    get_all,
-    insert, update, delete
-}, agenda_repository::{get_all_agendas, insert_agenda_repo, delete_agenda_repo, update_agenda_repo}}, dtos::{agenda::{AgendaDTO, NewAgendaDTO}, news::NewsPost}};
-use rocket::{serde::json::Json};
-use crate::dtos::todo::{TodoDTO, NewTodoDTO};
-use select::{document::Document, predicate::{Predicate, Name}};
+use crate::dtos::todo::{NewTodoDTO, TodoDTO};
+use crate::{
+    dtos::{
+        agenda::{AgendaDTO, NewAgendaDTO},
+        news::NewsPost,
+    },
+    repository::{
+        agenda_repository::{delete_agenda_repo, get_all_agendas, insert_agenda_repo},
+        todo_repository::{delete, get_all, insert, update},
+    },
+};
+use rocket::serde::json::Json;
 use select::predicate::Class;
-
+use select::{
+    document::Document,
+    predicate::{Name, Predicate},
+};
 
 #[get("/")]
 pub async fn get_all_todos() -> Json<Vec<TodoDTO>> {
     let todos = get_all();
-    let result: Vec<TodoDTO> = todos
-        .into_iter()
-        .map(|x| x.into()).collect();
+    let result: Vec<TodoDTO> = todos.into_iter().map(|x| x.into()).collect();
 
     rocket::serde::json::Json(result)
 }
@@ -21,22 +27,16 @@ pub async fn get_all_todos() -> Json<Vec<TodoDTO>> {
 #[get("/")]
 pub async fn get_all_agenda() -> Json<Vec<AgendaDTO>> {
     let agendas = get_all_agendas();
-    let result: Vec<AgendaDTO> = agendas
-        .into_iter()
-        .map(|x| x.into()).collect();
+    let result: Vec<AgendaDTO> = agendas.into_iter().map(|x| x.into()).collect();
 
     rocket::serde::json::Json(result)
 }
 
-#[post("/", format="json", data = "<new_agenda>")]
+#[post("/", format = "json", data = "<new_agenda>")]
 pub async fn insert_agenda(new_agenda: Json<NewAgendaDTO>) -> Json<Vec<AgendaDTO>> {
     let agendas = insert_agenda_repo(new_agenda.into_inner().into());
 
-    let result: Vec<AgendaDTO> =
-        agendas
-        .into_iter()
-        .map(|x| x.into())
-        .collect();
+    let result: Vec<AgendaDTO> = agendas.into_iter().map(|x| x.into()).collect();
 
     rocket::serde::json::Json(result)
 }
@@ -44,11 +44,7 @@ pub async fn insert_agenda(new_agenda: Json<NewAgendaDTO>) -> Json<Vec<AgendaDTO
 #[post("/", format = "json", data = "<new_todo>")]
 pub async fn insert_todo(new_todo: Json<NewTodoDTO>) -> Json<Vec<TodoDTO>> {
     let todos = insert(new_todo.into_inner().into());
-    let result: Vec<TodoDTO> = 
-        todos
-        .into_iter()
-        .map(|x| x.into())
-        .collect();
+    let result: Vec<TodoDTO> = todos.into_iter().map(|x| x.into()).collect();
 
     rocket::serde::json::Json(result)
 }
@@ -75,22 +71,20 @@ pub async fn update_todo(todo: Json<TodoDTO>) -> Json<TodoDTO> {
 
 #[get("/scrape")]
 pub async fn scrape() -> Json<Vec<NewsPost>> {
-
     let url = "https://www.cs.ubbcluj.ro";
     let response = reqwest::get(url).await.unwrap().text().await.unwrap();
 
     let document = Document::from(response.as_str());
 
     let mut results = Vec::new();
-    
+
     for div in document.find(Class("post-wrap").and(Class("clearfix"))) {
-        
         let title = div
-        .find(Name("h2"))
-        .next()
-        .and_then(|h2| h2.find(Name("a")).next())
-        .map(|a| a.text())
-        .unwrap_or_default();
+            .find(Name("h2"))
+            .next()
+            .and_then(|h2| h2.find(Name("a")).next())
+            .map(|a| a.text())
+            .unwrap_or_default();
 
         let description = div
             .find(Class("entry").and(Class("clearfix")))
@@ -98,10 +92,8 @@ pub async fn scrape() -> Json<Vec<NewsPost>> {
             .map(|entry| entry.text())
             .unwrap_or_default();
 
-        results.push(NewsPost::new(title,description));
-
+        results.push(NewsPost::new(title, description));
     }
-
 
     rocket::serde::json::Json(results)
 }
