@@ -15,7 +15,7 @@ export const Todos = () => {
     const [description, setDescription] = useState<string>("");
     const [title, setTitle] = useState<string>("");
     const [id, setId] = useState<number>();
-    const { todosList } = todosState;
+    const { todosList, todosLoading, todosOperationLoading } = todosState;
     const [visible, setVisible] = useState<boolean>(false);
 
     useEffect(() => {
@@ -39,7 +39,7 @@ export const Todos = () => {
         return (
             <div>
                 {data.description}
-                <Button onClick={() => onDeleteClicked(data.id)} className="ml-4" severity="danger">Delete</Button>
+                <Button onClick={() => onDeleteClicked(data.id)} className="ml-4" severity="danger">Done!</Button>
             </div>
         )
     }
@@ -56,10 +56,11 @@ export const Todos = () => {
             <div>
                 <Link to="/">Home</Link>
             </div>
-            <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message="Are you sure you want to delete this todo item?" 
+            <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message="Are you sure you want to complete this todo item?" 
     header="Confirmation" icon="pi pi-exclamation-triangle" accept={onDeleteAccept} />
+    
 
-            <DataTable value={todosList} paginator rows={10}>
+            <DataTable value={todosList} paginator rows={5} loading={todosLoading} >
                 <Column className="pb-5 pr-5" field="title" header="Title"></Column>
                 <Column
                     className="pb-5 pr-5"
@@ -83,7 +84,7 @@ export const Todos = () => {
                     />
                 </div>
                 <div className="flex py-4 align-content-center	">
-                    <Button onClick={() => onAddButtonClicked()}>Add</Button>
+                    <Button loading={todosOperationLoading} onClick={() => onAddButtonClicked()}>Add</Button>
                 </div>
             </div>
 
