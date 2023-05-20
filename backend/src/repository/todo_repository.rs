@@ -1,7 +1,7 @@
 
 use diesel::prelude::*;
 use crate::models::models::{Todo, NewTodo};
-use crate::repository::connection::database_connection::{establish_connection};
+use crate::repository::connection::database_connection::establish_connection;
 use crate::schema::todos::dsl::*;
 use diesel::prelude::QueryResult;
 use log::{error};
@@ -60,7 +60,7 @@ pub fn delete(todo_id: i32) -> bool
     let connection = &mut establish_connection();
     let num_deleted = diesel::delete(todos.filter(id.eq(todo_id)))
         .execute(connection)
-        .expect("Error deleting posts");
+        .expect("Error deleting todo");
 
     num_deleted != 0
 }

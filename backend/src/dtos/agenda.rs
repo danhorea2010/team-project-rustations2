@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 
-use crate::models::agenda::Agenda;
+use crate::models::agenda::{Agenda, NewAgenda};
 
 
 #[derive(Debug,Clone,Serialize, Deserialize)]
@@ -24,6 +24,15 @@ impl From<Agenda> for AgendaDTO {
             deadline: agenda.deadline.clone()
         }
     }
+}
+
+impl From<NewAgendaDTO> for NewAgenda {
+    fn from(dto: NewAgendaDTO) -> Self {
+        NewAgenda { 
+            title: dto.title, 
+            deadline: dto.deadline.clone()
+        }
+    } 
 }
 
 

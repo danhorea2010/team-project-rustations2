@@ -8,7 +8,7 @@ mod schema;
 mod models;
 mod dtos;
 
-use endpoints::{endpoints::{get_all_todos, get_all_agenda, insert_todo, update_todo, delete_todo}, cors::{Cors, all_options}};
+use endpoints::{endpoints::{get_all_todos, get_all_agenda,insert_agenda, insert_todo, update_todo, delete_todo, delete_agenda}, cors::{Cors, all_options}};
 
 
 #[launch]
@@ -19,7 +19,7 @@ async fn rocket() -> _ {
     )
     .mount("/", routes![all_options])
     .mount("/agenda", 
-        routes![get_all_agenda]
+        routes![get_all_agenda, insert_agenda, delete_agenda]
     )    
 
     
