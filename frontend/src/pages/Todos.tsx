@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { useAppDispatch, useAppSelector } from "../main";
-import { loadTodos } from "../store/todos";
+import { deleteTodo, loadTodos } from "../store/todos";
 import { Link } from "react-router-dom";
+import {Button} from "primereact/button";
 
 export const Todos = () => {
     const dispatch = useAppDispatch();
@@ -14,6 +15,21 @@ export const Todos = () => {
     useEffect(() => {
         dispatch(loadTodos(false));
     }, []);
+
+    const onDeleteClicked = (id: number) => {
+        dispatch(deleteTodo(id)).then(() => {
+            dispatch(loadTodos(true))
+        });
+    }
+
+    const buttonDescriptionBody = (data: any) => {
+        return (
+            <div>
+                {data.description}
+                <Button onClick={() => onDeleteClicked(data.id)} className="ml-4" severity="danger">Delete</Button>
+            </div>
+        )
+    }
 
     return (
         <div>
@@ -27,12 +43,8 @@ export const Todos = () => {
                 <Column
                     className="pb-5 pr-5"
                     field="description"
+                    body={buttonDescriptionBody}
                     header="Description"
-                ></Column>
-                <Column
-                    className="pb-5 pr-5"
-                    field="visibility"
-                    header="Visibility"
                 ></Column>
             </DataTable>
 

@@ -40,3 +40,4 @@ pub async fn update_todo(todo: Json<TodoDTO>) -> Json<TodoDTO> {
 
     rocket::serde::json::Json(updated_todo_dto)
 }
+

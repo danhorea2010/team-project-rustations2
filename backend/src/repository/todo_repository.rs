@@ -55,10 +55,10 @@ pub fn update(update_todo: Todo) -> Todo
     return todo;
 }
 
-pub fn delete(todoId: i32) -> bool
+pub fn delete(todo_id: i32) -> bool
 {
     let connection = &mut establish_connection();
-    let num_deleted = diesel::delete(todos.filter(id.eq(todoId)))
+    let num_deleted = diesel::delete(todos.filter(id.eq(todo_id)))
         .execute(connection)
         .expect("Error deleting posts");
 
