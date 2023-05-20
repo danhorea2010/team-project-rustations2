@@ -3,6 +3,10 @@ import {apiCallBegan} from './baseapi';
 
 export type AgendaEntry = {
 }
+
+export type NewAgendaEntry = {
+
+}
   
 type AgendaState = {
 }
