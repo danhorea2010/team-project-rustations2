@@ -28,7 +28,7 @@ services:
     environment:
       DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@backend_db:5432/${POSTGRES_DB}"
     depends_on:
-      - db
+      - backend_db
       - rabbitmq
   mom:
     restart: unless-stopped
@@ -39,5 +39,5 @@ services:
     environment:
       DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@backend_db:5432/${POSTGRES_DB}"
     depends_on:
-      - db
+      - backend_db
       - rabbitmq
