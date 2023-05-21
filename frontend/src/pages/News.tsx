@@ -29,9 +29,6 @@ export const News = () => {
                 <Link to="/agenda">Agenda</Link>
             </div>
             <div>
-                <Link to="/deadlines">Deadlines</Link>
-            </div>
-            <div>
                 <Link to="/news">News</Link>
             </div>
             <DataTable value={newsList}>
