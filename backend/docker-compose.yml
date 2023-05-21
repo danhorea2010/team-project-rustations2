@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  db:
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    image: "postgres:12"
+    ports:
+      - "5433:5432"
+  # nginx:
+  #   image: mynginx:latest
+  #   ports:
+  #     - 8000:8000
+  #   network_mode: host
+  web:
+    restart: unless-stopped
+    image: rust-team-project:latest
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      #i have  no clu why but we need to use 5432
+      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+    depends_on:
+      - db
+      # - nginx
+    # network_mode: host

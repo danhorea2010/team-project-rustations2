@@ -1,0 +1,2 @@
+docker build . -t rust-team-project
+docker compose up

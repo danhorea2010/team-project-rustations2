@@ -69,6 +69,11 @@ pub async fn update_todo(todo: Json<TodoDTO>) -> Json<TodoDTO> {
     rocket::serde::json::Json(updated_todo_dto)
 }
 
+#[get("/test")]
+pub async fn test() -> Json<String> {
+    rocket::serde::json::Json(String::from("test"))
+}
+
 #[get("/scrape")]
 pub async fn scrape() -> Json<Vec<NewsPost>> {
     let url = "https://www.cs.ubbcluj.ro";
