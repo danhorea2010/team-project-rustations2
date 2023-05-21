@@ -1,6 +1,16 @@
 version: '3'
 
 services:
+  rabbitmq:
+        image: rabbitmq:3-management
+        volumes:
+            - ./rabbitmq/etc/definitions.json:/etc/rabbitmq/defu.json
+            - ./rabbitmq/etc/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+            - ./rabbitmq/data:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
+            - ./rabbitmq/logs:/var/log/rabbitmq/log
+        ports:
+            - 5672:5672
+            - "127.0.0.1:15672:15672"
   db:
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
@@ -9,11 +19,6 @@ services:
     image: "postgres:12"
     ports:
       - "5433:5432"
-  # nginx:
-  #   image: mynginx:latest
-  #   ports:
-  #     - 8000:8000
-  #   network_mode: host
   web:
     restart: unless-stopped
     image: rust-team-project:latest
@@ -25,5 +30,4 @@ services:
       DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
     depends_on:
       - db
-      # - nginx
-    # network_mode: host
+      - rabbitmq
