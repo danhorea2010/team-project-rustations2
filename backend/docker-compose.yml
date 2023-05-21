@@ -6,16 +6,24 @@ services:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_DB: "${POSTGRES_DB}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-    image: postgres:9.6-alpine
+    image: "postgres:12"
     ports:
-      - "5434:5432"
+      - "5433:5432"
+  # nginx:
+  #   image: mynginx:latest
+  #   ports:
+  #     - 8000:8000
+  #   network_mode: host
   web:
+    restart: unless-stopped
     image: rust-team-project:latest
     build: .
     ports:
       - "127.0.0.1:8000:8000"
     environment:
-      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5434/${POSTGRES_DB}"
+      #i have  no clu why but we need to use 5432
+      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
     depends_on:
       - db
-    network_mode: host
+      # - nginx
+    # network_mode: host

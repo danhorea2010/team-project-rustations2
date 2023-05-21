@@ -21,6 +21,4 @@ async fn rocket() -> _ {
     .mount("/agenda", 
         routes![get_all_agenda, insert_agenda, delete_agenda]
     )    
-
-    
 }
