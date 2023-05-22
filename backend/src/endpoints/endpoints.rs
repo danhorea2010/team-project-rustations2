@@ -15,6 +15,7 @@ use select::{
     document::Document,
     predicate::{Name, Predicate},
 };
+use crate::rabbit::{get_pool, rmq_listen, send_message};
 
 #[get("/")]
 pub async fn get_all_todos() -> Json<Vec<TodoDTO>> {
@@ -68,10 +69,11 @@ pub async fn update_todo(todo: Json<TodoDTO>) -> Json<TodoDTO> {
 
     rocket::serde::json::Json(updated_todo_dto)
 }
-
 #[get("/test")]
 pub async fn test() -> Json<String> {
-    rocket::serde::json::Json(String::from("test"))
+    let _result = send_message(get_pool(String::from("conn")).await, String::from("request")).await;
+    let finalResult = rmq_listen(get_pool(String::from("conn2")).await);
+    rocket::serde::json::Json(finalResult.await.unwrap())
 }
 
 #[get("/scrape")]

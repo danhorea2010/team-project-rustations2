@@ -9,7 +9,7 @@ services:
             - ./rabbitmq/data:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
             - ./rabbitmq/logs:/var/log/rabbitmq/log
         ports:
-            - 5672:5672
+            - "5672:5672"
             - "127.0.0.1:15673:15672"
   backend_db:
     environment:
@@ -25,17 +25,6 @@ services:
     build: .
     ports:
       - "127.0.0.1:8000:8000"
-    environment:
-      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@backend_db:5432/${POSTGRES_DB}"
-    depends_on:
-      - backend_db
-      - rabbitmq
-  mom:
-    restart: unless-stopped
-    image: rust-team-project-mom:latest
-    build: .
-    ports:
-      - "127.0.0.1:8001:8000"
     environment:
       DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@backend_db:5432/${POSTGRES_DB}"
     depends_on:
