@@ -79,7 +79,7 @@ export const deleteAgenda = ( id: number) => (dispatch: any, getState: any) => {
     )
 };
 
-export const insertAgenda = (agenda: AgendaEntry) => (dispatch: any, getState: any) => {
+export const insertAgenda = (agenda: NewAgendaEntry) => (dispatch: any, getState: any) => {
     let {title, deadline_date} =  agenda;
 
     const deadline = moment(deadline_date).format("YYYY-MM-DDT00:00:00.000000")

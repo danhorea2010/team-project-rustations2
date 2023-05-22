@@ -45,9 +45,11 @@ export const Todos = () => {
     }
 
     const onDeleteAccept = () => {
-        dispatch(deleteTodo(id)).then(() => {
-            dispatch(loadTodos(true))
-        });
+        if(id) {
+            dispatch(deleteTodo(id)).then(() => {
+                dispatch(loadTodos(true))
+            });
+        }
     }
 
     return (
