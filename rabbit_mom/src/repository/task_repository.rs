@@ -8,6 +8,7 @@ use log::error;
 pub fn get(task_id: i32) -> Task {
     let connection = &mut establish_connection();
     let task = tasks.filter(id.eq(task_id))
+            .filter(task_started.eq(false))
             .get_result(connection)
             .expect("Cannot update todo");
 

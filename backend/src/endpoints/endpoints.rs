@@ -1,6 +1,6 @@
 use crate::dtos::todo::{NewTodoDTO, TodoDTO};
 use crate::models::tasks::{NewTask, Task};
-use crate::schema::tasks::{task_started, task_finished};
+use crate::models::models::{Todo};
 use crate::{
     dtos::{
         agenda::{AgendaDTO, NewAgendaDTO},
@@ -24,8 +24,22 @@ use serde_json::{Result, Value};
 
 #[get("/")]
 pub async fn get_all_todos() -> Json<Vec<TodoDTO>> {
-    let todos = get_all();
-    let result: Vec<TodoDTO> = todos.into_iter().map(|x| x.into()).collect();
+    let new_task: NewTask = NewTask {
+        task_started: false,
+        task_finished: false
+    };
+    let mut task = insert_task(new_task);
+    println!("{:?}", task);
+    let new_task_dto = TaskDTO {
+        task_id: task.into_iter().nth(0).unwrap().id,
+        path: String::from("get_all_todos"),
+        parameter_id: None,
+        content: None
+    };
+    let _result = send_message(get_pool(String::from("conn")).await, String::from("request"), serde_json::to_string(&new_task_dto).unwrap()).await;
+    let rabbitResult = rmq_listen(get_pool(String::from("conn2")).await);
+    let taskResponse: TaskDTO = serde_json::from_str(rabbitResult.await.unwrap().as_str()).unwrap();
+    let result: Vec<TodoDTO> = serde_json::from_str(taskResponse.content.unwrap().as_str()).unwrap();
 
     rocket::serde::json::Json(result)
 }
@@ -90,8 +104,9 @@ pub async fn test() -> Json<String> {
         content: None
     };
     let _result = send_message(get_pool(String::from("conn")).await, String::from("request"), serde_json::to_string(&new_task_dto).unwrap()).await;
-    let finalResult = rmq_listen(get_pool(String::from("conn2")).await);
-    rocket::serde::json::Json(finalResult.await.unwrap())
+    let rabbitResult = rmq_listen(get_pool(String::from("conn2")).await);
+    let finalResult: TaskDTO = serde_json::from_str(rabbitResult.await.unwrap().as_str()).unwrap();
+    rocket::serde::json::Json(finalResult.content.unwrap())
 }
 
 #[get("/scrape")]

@@ -8,8 +8,20 @@ use thiserror::Error as ThisError;
 use tokio_amqp::*;
 use warp::{Filter, Rejection, Reply};
 use serde::{Deserialize, Serialize};
-use crate::repository::task_repository::{get as get_task, insert as insert_task, update as update_task};
-use crate::dtos::task::{TaskDTO};
+use crate::{
+    dtos::{
+        agenda::{AgendaDTO, NewAgendaDTO},
+        news::NewsPost,
+        task::TaskDTO,
+        todo::TodoDTO
+    },
+    repository::{
+        agenda_repository::{delete_agenda_repo, get_all_agendas, insert_agenda_repo},
+        todo_repository::{delete, get_all, insert, update},
+        task_repository::{get as get_task, insert as insert_task, update as update_task},
+    },
+};
+
 type WebResult<T> = StdResult<T, Rejection>;
 type RMQResult<T> = StdResult<T, PoolError>;
 type Result<T> = StdResult<T, Error>;
@@ -110,6 +122,11 @@ async fn get_content(path: String, parameter_id: Option<i32>) -> String
 {
     let result = match path.as_str() {
         "test" => String::from("test"),
+        "get_all_todos" => {
+            let todos = get_all();
+            let result: Vec<TodoDTO> = todos.into_iter().map(|x| x.into()).collect();
+            serde_json::to_string(&result).unwrap()
+        }
         default => String::from("unkown")
     };
     result
