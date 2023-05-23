@@ -6,6 +6,7 @@ pub struct TaskDTO {
     pub task_id: i32,
     pub path: String,
     pub parameter_id: Option<i32>,
+    pub content: Option<String>,
 }
 
 

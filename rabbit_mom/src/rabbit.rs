@@ -97,13 +97,22 @@ async fn init_rmq_listen(pool: Pool, queue_name: String) -> Result<()> {
             let new_task_dto = TaskDTO {
                 task_id: updated_task2.id,
                 path: String::from("response"),
-                parameter_id: None
+                parameter_id: None,
+                content: Some(get_content(task.path, task.parameter_id).await)
             };
             send_message(get_pool(String::from("response_conn")).await, serde_json::to_string(&new_task_dto).unwrap(),  String::from("response")).await;
             println!("I sent a message");
         }
     }
     Ok(())
+}
+async fn get_content(path: String, parameter_id: Option<i32>) -> String 
+{
+    let result = match path.as_str() {
+        "test" => String::from("test"),
+        default => String::from("unkown")
+    };
+    result
 }
 
 async fn get_rmq_con(pool: Pool) -> RMQResult<Connection> {

@@ -86,7 +86,8 @@ pub async fn test() -> Json<String> {
     let new_task_dto = TaskDTO {
         task_id: task.into_iter().nth(0).unwrap().id,
         path: String::from("test"),
-        parameter_id: None
+        parameter_id: None,
+        content: None
     };
     let _result = send_message(get_pool(String::from("conn")).await, String::from("request"), serde_json::to_string(&new_task_dto).unwrap()).await;
     let finalResult = rmq_listen(get_pool(String::from("conn2")).await);
