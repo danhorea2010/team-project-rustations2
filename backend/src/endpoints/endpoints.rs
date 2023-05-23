@@ -114,14 +114,46 @@ pub async fn insert_todo(new_todo: Json<NewTodoDTO>) -> Json<Vec<TodoDTO>> {
 
 #[delete("/<id>")]
 pub async fn delete_agenda(id: i32) -> Json<bool> {
-    let is_deleted = delete_agenda_repo(id);
-    rocket::serde::json::Json(is_deleted)
+    let new_task: NewTask = NewTask {
+        task_started: false,
+        task_finished: false
+    };
+    let mut task = insert_task(new_task);
+    println!("{:?}", task);
+    let new_task_dto = TaskDTO {
+        task_id: task.into_iter().nth(0).unwrap().id,
+        path: String::from("delete_agenda"),
+        parameter_id: Some(id),
+        content: None
+    };
+    let _result = send_message(get_pool(String::from("conn")).await, String::from("request"), serde_json::to_string(&new_task_dto).unwrap()).await;
+    let rabbitResult = rmq_listen(get_pool(String::from("conn2")).await);
+    let taskResponse: TaskDTO = serde_json::from_str(rabbitResult.await.unwrap().as_str()).unwrap();
+    let result: bool = serde_json::from_str(taskResponse.content.unwrap().as_str()).unwrap();
+
+    rocket::serde::json::Json(result)
 }
 
 #[delete("/<id>")]
 pub async fn delete_todo(id: i32) -> Json<bool> {
-    let is_deleted = delete(id);
-    rocket::serde::json::Json(is_deleted)
+    let new_task: NewTask = NewTask {
+        task_started: false,
+        task_finished: false
+    };
+    let mut task = insert_task(new_task);
+    println!("{:?}", task);
+    let new_task_dto = TaskDTO {
+        task_id: task.into_iter().nth(0).unwrap().id,
+        path: String::from("delete_todo"),
+        parameter_id: Some(id),
+        content: None
+    };
+    let _result = send_message(get_pool(String::from("conn")).await, String::from("request"), serde_json::to_string(&new_task_dto).unwrap()).await;
+    let rabbitResult = rmq_listen(get_pool(String::from("conn2")).await);
+    let taskResponse: TaskDTO = serde_json::from_str(rabbitResult.await.unwrap().as_str()).unwrap();
+    let result: bool = serde_json::from_str(taskResponse.content.unwrap().as_str()).unwrap();
+
+    rocket::serde::json::Json(result)
 }
 
 #[put("/", data = "<todo>")]

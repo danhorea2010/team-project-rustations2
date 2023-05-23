@@ -145,6 +145,14 @@ async fn get_content(path: String, parameter_id: Option<i32>, content: Option<St
 
             serde_json::to_string(&result).unwrap()
         },
+        "delete_agenda" => {
+            let is_deleted = delete_agenda_repo(parameter_id.unwrap());
+            serde_json::to_string(&is_deleted).unwrap()
+        },
+        "delete_todo" => {
+            let is_deleted = delete(parameter_id.unwrap());
+            serde_json::to_string(&is_deleted).unwrap()
+        }
         default => String::from("unkown")
     };
     result
