@@ -21,6 +21,11 @@ use crate::{
         task_repository::{get as get_task, insert as insert_task, update as update_task},
     },
 };
+use select::predicate::Class;
+use select::{
+    document::Document,
+    predicate::{Name, Predicate},
+};
 
 type WebResult<T> = StdResult<T, Rejection>;
 type RMQResult<T> = StdResult<T, PoolError>;
@@ -152,6 +157,38 @@ async fn get_content(path: String, parameter_id: Option<i32>, content: Option<St
         "delete_todo" => {
             let is_deleted = delete(parameter_id.unwrap());
             serde_json::to_string(&is_deleted).unwrap()
+        },
+        "update_todo" => {
+            let todo: TodoDTO = serde_json::from_str(content.unwrap().as_str()).unwrap();
+            let updated_todo = update(todo.into());
+            let updated_todo_dto: TodoDTO = updated_todo.into();
+            serde_json::to_string(&updated_todo_dto).unwrap()
+        },
+        "scrape" => {
+            let url = "https://www.cs.ubbcluj.ro";
+            let response = reqwest::get(url).await.unwrap().text().await.unwrap();
+
+            let document = Document::from(response.as_str());
+
+            let mut results = Vec::new();
+
+            for div in document.find(Class("post-wrap").and(Class("clearfix"))) {
+                let title = div
+                    .find(Name("h2"))
+                    .next()
+                    .and_then(|h2| h2.find(Name("a")).next())
+                    .map(|a| a.text())
+                    .unwrap_or_default();
+
+                let description = div
+                    .find(Class("entry").and(Class("clearfix")))
+                    .next()
+                    .map(|entry| entry.text())
+                    .unwrap_or_default();
+
+                results.push(NewsPost::new(title, description));
+            }
+            serde_json::to_string(&results).unwrap()
         }
         default => String::from("unkown")
     };

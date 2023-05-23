@@ -156,12 +156,27 @@ pub async fn delete_todo(id: i32) -> Json<bool> {
     rocket::serde::json::Json(result)
 }
 
-#[put("/", data = "<todo>")]
-pub async fn update_todo(todo: Json<TodoDTO>) -> Json<TodoDTO> {
-    let updated_todo = update(todo.into_inner().into());
-    let updated_todo_dto: TodoDTO = updated_todo.into();
+#[put("/", data = "<update_todo>")]
+pub async fn update_todo(update_todo: Json<TodoDTO>) -> Json<TodoDTO> {
+    let new_task: NewTask = NewTask {
+        task_started: false,
+        task_finished: false
+    };
+    let mut task = insert_task(new_task);
+    println!("{:?}", task);
+    let new_todo_struct = update_todo.into_inner();
+    let new_task_dto = TaskDTO {
+        task_id: task.into_iter().nth(0).unwrap().id,
+        path: String::from("add_todo"),
+        parameter_id: None,
+        content: Some(serde_json::to_string(&new_todo_struct).unwrap())
+    };
+    let _result = send_message(get_pool(String::from("conn")).await, String::from("request"), serde_json::to_string(&new_task_dto).unwrap()).await;
+    let rabbitResult = rmq_listen(get_pool(String::from("conn2")).await);
+    let taskResponse: TaskDTO = serde_json::from_str(rabbitResult.await.unwrap().as_str()).unwrap();
+    let result: TodoDTO = serde_json::from_str(taskResponse.content.unwrap().as_str()).unwrap();
 
-    rocket::serde::json::Json(updated_todo_dto)
+    rocket::serde::json::Json(result)
 }
 
 #[get("/test")]
@@ -186,29 +201,22 @@ pub async fn test() -> Json<String> {
 
 #[get("/scrape")]
 pub async fn scrape() -> Json<Vec<NewsPost>> {
-    let url = "https://www.cs.ubbcluj.ro";
-    let response = reqwest::get(url).await.unwrap().text().await.unwrap();
-
-    let document = Document::from(response.as_str());
-
-    let mut results = Vec::new();
-
-    for div in document.find(Class("post-wrap").and(Class("clearfix"))) {
-        let title = div
-            .find(Name("h2"))
-            .next()
-            .and_then(|h2| h2.find(Name("a")).next())
-            .map(|a| a.text())
-            .unwrap_or_default();
-
-        let description = div
-            .find(Class("entry").and(Class("clearfix")))
-            .next()
-            .map(|entry| entry.text())
-            .unwrap_or_default();
-
-        results.push(NewsPost::new(title, description));
-    }
-
-    rocket::serde::json::Json(results)
+    
+    let new_task: NewTask = NewTask {
+        task_started: false,
+        task_finished: false
+    };
+    let mut task = insert_task(new_task);
+    println!("{:?}", task);
+    let new_task_dto = TaskDTO {
+        task_id: task.into_iter().nth(0).unwrap().id,
+        path: String::from("scrape"),
+        parameter_id: None,
+        content: None
+    };
+    let _result = send_message(get_pool(String::from("conn")).await, String::from("request"), serde_json::to_string(&new_task_dto).unwrap()).await;
+    let rabbitResult = rmq_listen(get_pool(String::from("conn2")).await);
+    let taskResponse: TaskDTO = serde_json::from_str(rabbitResult.await.unwrap().as_str()).unwrap();
+    let result: Vec<NewsPost> = serde_json::from_str(taskResponse.content.unwrap().as_str()).unwrap();
+    rocket::serde::json::Json(result)
 }
