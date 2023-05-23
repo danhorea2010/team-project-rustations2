@@ -96,8 +96,7 @@ async fn get_rmq_con(pool: Pool) -> RMQResult<Connection> {
 }
 
 
-pub async fn send_message(pool: Pool, queue_name: String) -> WebResult<impl Reply> {
-    let payload = b"Hello world!";
+pub async fn send_message(pool: Pool, queue_name: String, payload: String) -> WebResult<impl Reply> {
 
     let rmq_con = get_rmq_con(pool).await.map_err(|e| {
         eprintln!("can't connect to rmq, {}", e);
@@ -123,7 +122,7 @@ pub async fn send_message(pool: Pool, queue_name: String) -> WebResult<impl Repl
             "",
             queue_name.as_str(),
             BasicPublishOptions::default(),
-            payload.to_vec(),
+            payload.as_str().as_bytes().to_vec(),
             BasicProperties::default(),
         )
         .await

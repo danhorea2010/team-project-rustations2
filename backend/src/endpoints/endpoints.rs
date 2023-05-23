@@ -1,12 +1,16 @@
 use crate::dtos::todo::{NewTodoDTO, TodoDTO};
+use crate::models::tasks::{NewTask, Task};
+use crate::schema::tasks::{task_started, task_finished};
 use crate::{
     dtos::{
         agenda::{AgendaDTO, NewAgendaDTO},
         news::NewsPost,
+        task::TaskDTO,
     },
     repository::{
         agenda_repository::{delete_agenda_repo, get_all_agendas, insert_agenda_repo},
         todo_repository::{delete, get_all, insert, update},
+        task_repository::{get, insert as insert_task, update as update_task},
     },
 };
 use rocket::serde::json::Json;
@@ -16,6 +20,7 @@ use select::{
     predicate::{Name, Predicate},
 };
 use crate::rabbit::{get_pool, rmq_listen, send_message};
+use serde_json::{Result, Value};
 
 #[get("/")]
 pub async fn get_all_todos() -> Json<Vec<TodoDTO>> {
@@ -69,9 +74,21 @@ pub async fn update_todo(todo: Json<TodoDTO>) -> Json<TodoDTO> {
 
     rocket::serde::json::Json(updated_todo_dto)
 }
+
 #[get("/test")]
 pub async fn test() -> Json<String> {
-    let _result = send_message(get_pool(String::from("conn")).await, String::from("request")).await;
+    let new_task: NewTask = NewTask {
+        task_started: false,
+        task_finished: false
+    };
+    let mut task = insert_task(new_task);
+    println!("{:?}", task);
+    let new_task_dto = TaskDTO {
+        task_id: task.into_iter().nth(0).unwrap().id,
+        path: String::from("test"),
+        parameter_id: None
+    };
+    let _result = send_message(get_pool(String::from("conn")).await, String::from("request"), serde_json::to_string(&new_task_dto).unwrap()).await;
     let finalResult = rmq_listen(get_pool(String::from("conn2")).await);
     rocket::serde::json::Json(finalResult.await.unwrap())
 }

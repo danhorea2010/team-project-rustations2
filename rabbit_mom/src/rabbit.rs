@@ -7,7 +7,9 @@ use std::time::Duration;
 use thiserror::Error as ThisError;
 use tokio_amqp::*;
 use warp::{Filter, Rejection, Reply};
-
+use serde::{Deserialize, Serialize};
+use crate::repository::task_repository::{get as get_task, insert as insert_task, update as update_task};
+use crate::dtos::task::{TaskDTO};
 type WebResult<T> = StdResult<T, Rejection>;
 type RMQResult<T> = StdResult<T, PoolError>;
 type Result<T> = StdResult<T, Error>;
@@ -78,11 +80,26 @@ async fn init_rmq_listen(pool: Pool, queue_name: String) -> Result<()> {
     println!("rmq consumer connected, waiting for messages");
     while let Some(delivery) = consumer.next().await {
         if let Ok((channel, delivery)) = delivery {
-            println!("received msg: {:?}", std::str::from_utf8(&delivery.data).unwrap());
+            let message_as_string = std::str::from_utf8(&delivery.data).unwrap();
+            let task: TaskDTO = serde_json::from_str(message_as_string).unwrap();
+            println!("received msg: {:?}", task);
+            let mut task_from_db = get_task(task.task_id);
+            println!("I got from db: {:?}", task_from_db);
+            task_from_db.task_started = true;
+            let mut updated_task = update_task(task_from_db);
+            println!("I updated: {:?}", updated_task);
+            updated_task.task_finished = true;
+            let updated_task2 = update_task(updated_task);
+            println!("I updated: {:?}", updated_task2);
             channel
                 .basic_ack(delivery.delivery_tag, BasicAckOptions::default())
                 .await?;
-            send_message(get_pool(String::from("response_conn")).await, String::from("Hello there"),  String::from("response")).await;
+            let new_task_dto = TaskDTO {
+                task_id: updated_task2.id,
+                path: String::from("response"),
+                parameter_id: None
+            };
+            send_message(get_pool(String::from("response_conn")).await, serde_json::to_string(&new_task_dto).unwrap(),  String::from("response")).await;
             println!("I sent a message");
         }
     }

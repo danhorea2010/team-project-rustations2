@@ -3,7 +3,10 @@ use lapin::{ConnectionProperties, types::{LongString}};
 use crate::rabbit::{rmq_listen};
 
 mod rabbit;
-
+mod dtos;
+mod repository;
+mod models;
+mod schema;
 
 #[tokio::main]
 async fn main() -> Result<(), ()> {

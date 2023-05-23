@@ -194,6 +194,7 @@ dependencies = [
  "rocket",
  "select",
  "serde",
+ "serde_json",
  "sqlx",
  "thiserror",
  "tokio",

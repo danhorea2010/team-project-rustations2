@@ -36,9 +36,18 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+    tasks (id) {
+        id -> Int4,
+        task_started -> Bool,
+        task_finished -> Bool,
+    }
+}
+
 diesel::allow_tables_to_appear_in_same_query!(
     _sqlx_migrations,
     agendas,
     todo,
     todos,
+    tasks
 );
