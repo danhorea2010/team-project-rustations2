@@ -7,6 +7,7 @@ mod repository;
 mod schema;
 mod models;
 mod dtos;
+mod rabbit;
 
 use endpoints::{endpoints::{get_all_todos, get_all_agenda,insert_agenda, insert_todo, update_todo, delete_todo, delete_agenda, scrape, test}, cors::{Cors, all_options}};
 

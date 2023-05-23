@@ -19,25 +19,25 @@ services:
     image: "postgres:12"
     ports:
       - "5433:5432"
-  web:
-    restart: unless-stopped
-    image: rust-team-project-backend:latest
-    build: .
-    ports:
-      - "127.0.0.1:8000:8000"
-    environment:
-      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@backend_db:5432/${POSTGRES_DB}"
-    depends_on:
-      - backend_db
-      - rabbitmq
-  # mom:
+  # web:
   #   restart: unless-stopped
-  #   image: rust-team-project-mom:latest
+  #   image: rust-team-project-backend:latest
   #   build: .
   #   ports:
-  #     - "127.0.0.1:8001:8000"
+  #     - "127.0.0.1:8000:8000"
   #   environment:
   #     DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@backend_db:5432/${POSTGRES_DB}"
   #   depends_on:
   #     - db
   #     - rabbitmq
+  mom:
+    restart: unless-stopped
+    image: rust-team-project-mom:latest
+    build: .
+    ports:
+      - "127.0.0.1:8001:8000"
+    environment:
+      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@backend_db:5432/${POSTGRES_DB}"
+    depends_on:
+      - backend_db
+      - rabbitmq
