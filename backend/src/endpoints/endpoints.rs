@@ -46,25 +46,68 @@ pub async fn get_all_todos() -> Json<Vec<TodoDTO>> {
 
 #[get("/")]
 pub async fn get_all_agenda() -> Json<Vec<AgendaDTO>> {
-    let agendas = get_all_agendas();
-    let result: Vec<AgendaDTO> = agendas.into_iter().map(|x| x.into()).collect();
+    let new_task: NewTask = NewTask {
+        task_started: false,
+        task_finished: false
+    };
+    let mut task = insert_task(new_task);
+    println!("{:?}", task);
+    let new_task_dto = TaskDTO {
+        task_id: task.into_iter().nth(0).unwrap().id,
+        path: String::from("get_all_agendas"),
+        parameter_id: None,
+        content: None
+    };
+    let _result = send_message(get_pool(String::from("conn")).await, String::from("request"), serde_json::to_string(&new_task_dto).unwrap()).await;
+    let rabbitResult = rmq_listen(get_pool(String::from("conn2")).await);
+    let taskResponse: TaskDTO = serde_json::from_str(rabbitResult.await.unwrap().as_str()).unwrap();
+    let result: Vec<AgendaDTO> = serde_json::from_str(taskResponse.content.unwrap().as_str()).unwrap();
 
     rocket::serde::json::Json(result)
 }
 
 #[post("/", format = "json", data = "<new_agenda>")]
 pub async fn insert_agenda(new_agenda: Json<NewAgendaDTO>) -> Json<Vec<AgendaDTO>> {
-    let agendas = insert_agenda_repo(new_agenda.into_inner().into());
-
-    let result: Vec<AgendaDTO> = agendas.into_iter().map(|x| x.into()).collect();
-
+    
+    let new_task: NewTask = NewTask {
+        task_started: false,
+        task_finished: false
+    };
+    let mut task = insert_task(new_task);
+    println!("{:?}", task);
+    let new_agenda_struct = new_agenda.into_inner();
+    let new_task_dto = TaskDTO {
+        task_id: task.into_iter().nth(0).unwrap().id,
+        path: String::from("add_agenda"),
+        parameter_id: None,
+        content: Some(serde_json::to_string(&new_agenda_struct).unwrap())
+    };
+    let _result = send_message(get_pool(String::from("conn")).await, String::from("request"), serde_json::to_string(&new_task_dto).unwrap()).await;
+    let rabbitResult = rmq_listen(get_pool(String::from("conn2")).await);
+    let taskResponse: TaskDTO = serde_json::from_str(rabbitResult.await.unwrap().as_str()).unwrap();
+    let result: Vec<AgendaDTO> = serde_json::from_str(taskResponse.content.unwrap().as_str()).unwrap();
     rocket::serde::json::Json(result)
 }
 
 #[post("/", format = "json", data = "<new_todo>")]
 pub async fn insert_todo(new_todo: Json<NewTodoDTO>) -> Json<Vec<TodoDTO>> {
-    let todos = insert(new_todo.into_inner().into());
-    let result: Vec<TodoDTO> = todos.into_iter().map(|x| x.into()).collect();
+    let new_task: NewTask = NewTask {
+        task_started: false,
+        task_finished: false
+    };
+    let mut task = insert_task(new_task);
+    println!("{:?}", task);
+    let new_todo_struct = new_todo.into_inner();
+    let new_task_dto = TaskDTO {
+        task_id: task.into_iter().nth(0).unwrap().id,
+        path: String::from("add_todo"),
+        parameter_id: None,
+        content: Some(serde_json::to_string(&new_todo_struct).unwrap())
+    };
+    let _result = send_message(get_pool(String::from("conn")).await, String::from("request"), serde_json::to_string(&new_task_dto).unwrap()).await;
+    let rabbitResult = rmq_listen(get_pool(String::from("conn2")).await);
+    let taskResponse: TaskDTO = serde_json::from_str(rabbitResult.await.unwrap().as_str()).unwrap();
+    let result: Vec<TodoDTO> = serde_json::from_str(taskResponse.content.unwrap().as_str()).unwrap();
 
     rocket::serde::json::Json(result)
 }

@@ -13,7 +13,7 @@ use crate::{
         agenda::{AgendaDTO, NewAgendaDTO},
         news::NewsPost,
         task::TaskDTO,
-        todo::TodoDTO
+        todo::{TodoDTO, NewTodoDTO}
     },
     repository::{
         agenda_repository::{delete_agenda_repo, get_all_agendas, insert_agenda_repo},
@@ -110,7 +110,7 @@ async fn init_rmq_listen(pool: Pool, queue_name: String) -> Result<()> {
                 task_id: updated_task2.id,
                 path: String::from("response"),
                 parameter_id: None,
-                content: Some(get_content(task.path, task.parameter_id).await)
+                content: Some(get_content(task.path, task.parameter_id, task.content).await)
             };
             send_message(get_pool(String::from("response_conn")).await, serde_json::to_string(&new_task_dto).unwrap(),  String::from("response")).await;
             println!("I sent a message");
@@ -118,7 +118,7 @@ async fn init_rmq_listen(pool: Pool, queue_name: String) -> Result<()> {
     }
     Ok(())
 }
-async fn get_content(path: String, parameter_id: Option<i32>) -> String 
+async fn get_content(path: String, parameter_id: Option<i32>, content: Option<String>) -> String 
 {
     let result = match path.as_str() {
         "test" => String::from("test"),
@@ -126,7 +126,25 @@ async fn get_content(path: String, parameter_id: Option<i32>) -> String
             let todos = get_all();
             let result: Vec<TodoDTO> = todos.into_iter().map(|x| x.into()).collect();
             serde_json::to_string(&result).unwrap()
-        }
+        },
+        "get_all_agendas" => {
+            let agendas = get_all_agendas();
+            let result: Vec<AgendaDTO> = agendas.into_iter().map(|x| x.into()).collect();
+            serde_json::to_string(&result).unwrap()
+        },
+        "add_agenda" => {
+            let new_agenda: NewAgendaDTO = serde_json::from_str(content.unwrap().as_str()).unwrap();
+            let agendas = insert_agenda_repo(new_agenda.into());
+            let result: Vec<AgendaDTO> = agendas.into_iter().map(|x| x.into()).collect();
+            serde_json::to_string(&result).unwrap()
+        },
+        "add_todo" => {
+            let new_todo: NewTodoDTO = serde_json::from_str(content.unwrap().as_str()).unwrap();
+            let todos = insert(new_todo.into());
+            let result: Vec<TodoDTO> = todos.into_iter().map(|x| x.into()).collect();
+
+            serde_json::to_string(&result).unwrap()
+        },
         default => String::from("unkown")
     };
     result
